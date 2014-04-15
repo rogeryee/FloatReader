@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="float-reader" basedir="." default="build-project">
+
+	<property name="lib.dir" value="lib" />
+	<property name="source.dir" value="source" />
+	<property name="source.meta-info.dir" value="${source.dir}/META-INF" />
+	<property name="source.resources.dir" value="${source.dir}/com/yeep/floatreader/resources" />
+	<property name="config.dir" value="config" />
+	<property name="config.bin.dir" value="${config.dir}/bin" />
+	<property name="build.dir" value="build" />
+	<property name="build.dist.dir" value="${build.dir}/dist" />
+	<property name="build.classes.dir" value="${build.dir}/classes" />
+	<property name="build.classes.meta-info.dir" value="${build.classes.dir}/META-INF" />
+	<property name="build.classes.resources.dir" value="${build.classes.dir}/com/yeep/floatreader/resources" />
+
+	<property name="build.application.dir" value="${build.dir}/floatreader" />
+	<property name="build.application.bin.dir" value="${build.application.dir}/bin" />
+	<property name="build.application.lib.dir" value="${build.application.dir}/lib" />
+
+	<property name="jar.name" value="floatreader.jar" />
+
+	<!-- Define common classpath -->
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Build the yeep core -->
+	<target name="build-project" depends="clean-directory,create-directory,compile" />
+
+	<!-- clean all output files and directories -->
+	<target name="clean" depends="clean-directory" />
+
+	<!-- Compile the source code -->
+	<target name="compile">
+
+		<javac destdir="${build.classes.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${source.dir}" />
+			<classpath refid="build.classpath" />
+		</javac>
+
+		<copy todir="${build.classes.meta-info.dir}" overwrite="true">
+			<fileset dir="${source.meta-info.dir}" includes="**/*.MF" />
+		</copy>
+		
+		<copy todir="${build.classes.resources.dir}" overwrite="true">
+			<fileset dir="${source.resources.dir}" />
+		</copy>
+
+		<jar jarfile="${build.dist.dir}/${jar.name}" basedir="${build.classes.dir}" manifest="${build.classes.meta-info.dir}/MANIFEST.MF" compress="false">
+		</jar>
+
+	</target>
+
+	<!-- Build Application -->
+	<target name="build-application-64Bit" depends="build-project">
+
+		<copy todir="${build.application.bin.dir}" overwrite="true">
+			<fileset dir="${config.bin.dir}" />
+		</copy>
+
+		<copy todir="${build.application.lib.dir}" overwrite="true" flatten="true">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+				<include name="**/x64/*.dll" />
+			</fileset>
+			<fileset dir="${build.dist.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+
+	</target>
+	
+	<target name="build-application-32Bit" depends="build-project">
+
+			<copy todir="${build.application.bin.dir}" overwrite="true">
+				<fileset dir="${config.bin.dir}" />
+			</copy>
+
+			<copy todir="${build.application.lib.dir}" overwrite="true" flatten="true">
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+					<include name="**/x86/*.dll" />
+				</fileset>
+				<fileset dir="${build.dist.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</copy>
+
+		</target>
+
+	<!-- Clean build directory and Output diretory-->
+	<target name="clean-directory">
+		<delete dir="${build.classes.resources.dir}" />
+		<delete dir="${build.classes.meta-info.dir}" />
+		<delete dir="${build.classes.dir}" />
+		<delete dir="${build.dist.dir}" />
+
+		<delete dir="${build.application.dir}" />
+		<delete dir="${build.application.bin.dir}" />
+		<delete dir="${build.application.lib.dir}" />
+
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- Create build directory and Output diretory-->
+	<target name="create-directory">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dist.dir}" />
+		<mkdir dir="${build.classes.dir}" />
+		<mkdir dir="${build.classes.meta-info.dir}" />
+		<mkdir dir="${build.classes.resources.dir}" />
+
+		<mkdir dir="${build.application.dir}" />
+		<mkdir dir="${build.application.bin.dir}" />
+		<mkdir dir="${build.application.lib.dir}" />
+	</target>
+
+</project>
